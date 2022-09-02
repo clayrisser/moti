@@ -114,36 +114,9 @@ export const MotiPressable = forwardRef<View, MotiPressableProps>(
       }
     }
 
-    const child = (
-      <MotiView
-        from={from}
-        exit={exit}
-        transition={transition}
-        exitTransition={exitTransition}
-        state={state}
-        // TODO change API to this
-        // animate={useMemo(() => {
-        //   'worklet'
-
-        //   if (typeof animate === 'function') {
-        //     return animate(interaction.value)
-        //   }
-
-        //   return animate
-        // }, [])}
-        style={style}
-        onLayout={onLayout}
-      >
-        {typeof children == 'function'
-          ? // @ts-expect-error it thinks ReactNode can be a function, but it's fine.
-            children(interaction)
-          : children}
-      </MotiView>
-    )
-
-    let node: ReactNode
+    let child: ReactNode
     if (Platform.OS === 'web' || Platform.OS === 'android') {
-      node = (
+      child = (
         <Hoverable
           onHoverIn={updateInteraction('hovered', true, onHoverIn)}
           onHoverOut={updateInteraction('hovered', false, onHoverOut)}
@@ -182,12 +155,15 @@ export const MotiPressable = forwardRef<View, MotiPressableProps>(
             onBlur={onBlur}
             href={href}
           >
-            {child}
+            {typeof children == 'function'
+              ? // @ts-expect-error it thinks ReactNode can be a function, but it's fine.
+                children(interaction)
+              : children}
           </Pressable>
         </Hoverable>
       )
     } else {
-      node = (
+      child = (
         <TouchableWithoutFeedback
           onPressIn={updateInteraction('pressed', true, onPressIn)}
           onPressOut={updateInteraction('pressed', false, onPressOut)}
@@ -218,10 +194,40 @@ export const MotiPressable = forwardRef<View, MotiPressableProps>(
           onFocus={onFocus}
           onBlur={onBlur}
         >
-          {child}
+          {typeof children == 'function'
+            ? // @ts-expect-error it thinks ReactNode can be a function, but it's fine.
+              children(interaction)
+            : children}
         </TouchableWithoutFeedback>
       )
     }
+
+    const node = (
+      <MotiView
+        from={from}
+        exit={exit}
+        transition={transition}
+        exitTransition={exitTransition}
+        state={state}
+        // TODO change API to this
+        // animate={useMemo(() => {
+        //   'worklet'
+
+        //   if (typeof animate === 'function') {
+        //     return animate(interaction.value)
+        //   }
+
+        //   return animate
+        // }, [])}
+        style={style}
+        onLayout={onLayout}
+      >
+        {typeof children == 'function'
+          ? // @ts-expect-error it thinks ReactNode can be a function, but it's fine.
+            children(interaction)
+          : children}
+      </MotiView>
+    )
 
     const context = useMotiPressableContext()
 
